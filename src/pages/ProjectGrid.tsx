@@ -2,17 +2,15 @@ import React from 'react';
 import { ProjectCard } from '../components/ProjectCard';
 import { useProjectStore } from '../store/projectStore';
 import { Project, Resource } from '../constants/interfaces';
+import { useNavigationStore } from '../store/navigationStore';
 
-interface ProjectsGridProps {
-  onProjectSelect: (project: Project) => void;
-}
-
-const ProjectsGrid: React.FC<ProjectsGridProps> = ({ onProjectSelect }) => {
+const ProjectsGrid:React.FC = () => {
   const { projects, addProject, deleteProject } = useProjectStore();
+  const setSelectedProject = useNavigationStore(state => state.setSelectedProject);
 
   const handleCreateNew = () => {
     const newProject = {
-      id: crypto.randomUUID(),
+      id: Math.random().toString(36).substring(2) + Date.now().toString(36),
       title: `Project ${projects.length + 1}`,
       resources: [] as Resource[]
     };
@@ -25,7 +23,7 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = ({ onProjectSelect }) => {
         <ProjectCard
           key={index}
           project={project}
-          onClick={() => onProjectSelect(project)}
+          onClick={() => setSelectedProject(project)}
           onDelete={() => deleteProject(index)}
           index={index}
         />

@@ -7,7 +7,9 @@ export interface BaseResource {
 }
 
 export interface PDFResource extends BaseResource {
-  resourceType: 'arxiv-paper';
+  resourceType: 'pdf';
+  title: string;
+  settledTitle: boolean;
   content: string;
 }
 
@@ -35,7 +37,7 @@ export interface FileResource extends BaseResource {
   mimeType: string;
 }
 
-export type Resource = PDFResource | LinkResource | FileResource;
+export type Resource = PDFResource | LinkResource | FileResource | YoutubeResource;
 
 export interface Project {
     id: string;

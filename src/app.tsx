@@ -1,12 +1,11 @@
 import { createRoot } from 'react-dom/client';
-import { useState } from 'react';
 import { Sidebar } from './components/sidebar';
 import ProjectsGrid from './pages/ProjectGrid';
 import ProjectPage from './pages/ProjectPage';
-import { Project } from './constants/interfaces';
+import { useNavigationStore } from './store/navigationStore';
 
 const App = () => {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const selectedProject = useNavigationStore(state => state.selectedProject);
 
   return (
     <div className="flex min-h-screen bg-slate-300">
@@ -15,12 +14,12 @@ const App = () => {
         {selectedProject ? (
           <ProjectPage 
             projectId={selectedProject.id} 
-            onBack={() => setSelectedProject(null)} 
+            onBack={() => useNavigationStore.getState().setSelectedProject(null)} 
           />
         ) : (
           <>
             <h2 className="text-black text-2xl p-4">Projects</h2>
-            <ProjectsGrid onProjectSelect={setSelectedProject} />
+            <ProjectsGrid />
           </>
         )}
       </div>
