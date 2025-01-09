@@ -39,7 +39,8 @@ export interface UnderlineAnnotation extends BaseAnnotation {
 
 export type Annotation = HighlightAnnotation | UnderlineAnnotation;
 
-export type ResourceStatus = "PENDING" | "PROCESSING" | "CHUNKING" | "EMBEDDING" | "DONE";
+export type ResourceStatus = "ERROR" | "PENDING" | "PROCESSING" | "CHUNKING" | "EMBEDDING" | "DONE";
+export const TERMINAL_REOSURCE_STATES = ["ERROR", "DONE"];
 
 export interface BaseResource {
   resourceType: string;
@@ -89,5 +90,5 @@ export type Resource = PDFResource | LinkResource | FileResource | YoutubeResour
 export interface Project {
     id: string;
     title: string;
-    resources: any[];
+    resources: Resource[];
 }

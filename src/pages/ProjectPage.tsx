@@ -15,9 +15,11 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(project?.title ?? '');
   const updateProjectById = useProjectStore(state => state.updateProjectById);
+  const getProject = () => useProjectStore.getState().projects.find(p => p.id === projectId);
   const [isExpanded, setIsExpanded] = useState(true);
 
   if (!project) return null;
+  console.log(project.resources);
 
   const handleTitleSubmit = () => {
     updateProjectById(project.id, { title: editedTitle });
@@ -31,8 +33,33 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
   };
 
   const handleResourceDelete = (resourceId: string) => {
+    console.log("RESOURCE DELETING");
     updateProjectById(project.id, {
       resources: project.resources.filter(resource => resource.id !== resourceId)
+    });
+  };
+
+  const handleResourceUpdate = (resourceId: string, updatedResource: Resource) => {
+    console.log("RESOURCE UPDATING");
+    const currentProject = getProject();
+    console.log("Current resources:", currentProject?.resources);
+    console.log("Looking for resource with ID:", resourceId);
+    console.log("Updated resource:", updatedResource);
+    
+    if (!currentProject) return;
+
+    const updatedResources = currentProject.resources.map(resource => {
+      if (resource.id === resourceId) {
+        console.log("Found matching resource:", resource);
+        return updatedResource;
+      }
+      return resource;
+    });
+    
+    console.log("Updated resources array:", updatedResources);
+    
+    updateProjectById(currentProject.id, {
+      resources: updatedResources
     });
   };
 
@@ -114,6 +141,7 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
             resources={project.resources} 
             onResourceAdd={handleResourceAdd}
             onResourceDelete={handleResourceDelete}
+            onResourceUpdate={handleResourceUpdate}
           />}
         </div>
       </div>
