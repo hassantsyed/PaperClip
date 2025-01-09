@@ -15,8 +15,7 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(project?.title ?? '');
   const updateProjectById = useProjectStore(state => state.updateProjectById);
-  const [dividerPosition, setDividerPosition] = useState(300);
-  const [isDragging, setIsDragging] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   if (!project) return null;
 
@@ -24,38 +23,6 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
     updateProjectById(project.id, { title: editedTitle });
     setIsEditing(false);
   };
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (isDragging) {
-      const container = document.querySelector('.p-4');
-      if (container) {
-        const containerRect = container.getBoundingClientRect();
-        const newPosition = Math.max(0, e.y - containerRect.top);
-        setDividerPosition(newPosition);
-      }
-    }
-  }, [isDragging]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
-
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  }, []);
 
   const handleResourceAdd = (newResource: Resource) => {
     updateProjectById(project.id, {
@@ -110,16 +77,27 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
       <div className="flex-1 relative">
         <div 
           className="absolute top-0 left-0 right-0"
-          style={{ height: `${dividerPosition}px` }}
+          style={{ height: isExpanded ? '40%' : '85%' }}
         >
           {/* Add your upper content here */}
         </div>
-        <div 
-          className="absolute w-full select-none cursor-ns-resize"
-          style={{ top: `${dividerPosition}px` }}
-          onMouseDown={handleMouseDown}
-        >
-          <div className="absolute w-full border-t-4 border-black border-dotted">
+        <div className="absolute w-full select-none z-10">
+          <div 
+            className="absolute w-full border-t-4 border-black border-dotted"
+            style={{ top: isExpanded ? '40vh' : '85vh' }}
+          >
+            <div 
+              className="absolute left-1/2 -translate-x-1/2 -translate-y-10 
+                        cursor-pointer p-1"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              <span 
+                className="block transform transition-transform duration-300 text-black text-xl"
+                style={{ transform: `rotate(${isExpanded ? '90deg' : '-90deg'})` }}
+              >
+                ❯
+              </span>
+            </div>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
                           bg-slate-300 px-4 text-sm text-slate-500">
               {project.resources.length} resources
@@ -127,14 +105,16 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
           </div>
         </div>
         <div 
-          className="absolute left-0 right-0 bottom-0 bg-white"
-          style={{ top: `${dividerPosition + 20}px` }}
+          className={`absolute left-0 right-0 bottom-0 transition-all duration-300`}
+          style={{ 
+            top: isExpanded ? 'calc(40vh + 20px)' : 'calc(85vh + 20px)',
+          }}
         >
-          <ResourceGrid 
+          {isExpanded && <ResourceGrid 
             resources={project.resources} 
             onResourceAdd={handleResourceAdd}
             onResourceDelete={handleResourceDelete}
-          />
+          />}
         </div>
       </div>
     </div>

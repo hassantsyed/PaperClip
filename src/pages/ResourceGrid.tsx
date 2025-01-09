@@ -51,9 +51,13 @@ const ResourceGrid: React.FC<ResourceGridProps> = ({ resources, onResourceAdd, o
         createdAt: new Date(),
         tags: [],
         notes: [],
+        annotations: [],
+        progress: 0,
         content: '', // This will be populated with PDF content
         title: file.name.replace('.pdf', ''), // Remove the .pdf extension from the filename
         settledTitle: true, // Since we're using the actual filename
+        loading: false,
+        status: "DONE"
       };
       
       onResourceAdd(newResource);
@@ -62,8 +66,8 @@ const ResourceGrid: React.FC<ResourceGridProps> = ({ resources, onResourceAdd, o
 
   return (
     <div 
-      className={`h-full w-full bg-white transition-colors duration-200
-                ${isDraggingOver ? 'bg-slate-100 border-4 border-dashed border-slate-400' : ''}`}
+      className={`h-full w-full bg-blue-100 rounded-lg transition-colors duration-200
+                ${isDraggingOver ? 'bg-slate-100 border-4 rounded-lg border-dashed border-slate-400' : ''}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}

@@ -1,14 +1,12 @@
 # IMMEDIATE
 
 Upload Arxiv links
-Support Highlights
-Notes on resources
-Truncate resources like sidebar
-
-- maybe not draggable, either expand halfway and scrollable or truncated
-  Resource Selection as main content
+Resource Selection as main content
+PDF main content view
 
 -- Usable for me --
+
+PDF chunking and embedding
 
 # BACKLOG
 
@@ -28,3 +26,6 @@ List all Resources in a project
 Upload PDFs
 Remove resources
 Sidebar has projects
+Support Highlights
+Notes on resources
+Truncate resources like sidebar
