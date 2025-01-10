@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { PDFResource, Resource, LinkResource } from '../constants/interfaces';
 import { ResourceCard } from '../components/ResourceCard';
+import { LinkResourceModel, PDFResourceModel } from '../models/Resource';
 
 interface ResourceGridProps {
   resources: Resource[];
   onResourceAdd: (resource: Resource) => void;
   onResourceDelete: (resourceId: string) => void;
-  onResourceUpdate: (resourceId: string, resource: Resource) => void;
+  onResourceUpdate: (resourceId: string, resource: Partial<Resource>) => void;
 }
 
 const ResourceGrid: React.FC<ResourceGridProps> = ({ resources, onResourceAdd, onResourceDelete, onResourceUpdate }) => {
@@ -43,59 +44,36 @@ const ResourceGrid: React.FC<ResourceGridProps> = ({ resources, onResourceAdd, o
     const files = Array.from(e.dataTransfer.files);
     
     files.forEach(async (file) => {
-      if (file.type !== 'application/pdf') {
-        return;
-      }
-      console.log(file.name);
-      const newResource: PDFResource = {
-        resourceType: 'pdf',
-        id: Math.random().toString(36).substring(2),
-        createdAt: new Date(),
-        tags: [],
-        notes: [],
-        annotations: [],
-        progress: 0,
-        content: '', // This will be populated with PDF content
-        title: file.name.replace('.pdf', ''), // Remove the .pdf extension from the filename
-        settledTitle: true, // Since we're using the actual filename
-        loading: false,
-        status: "DONE"
-      };
-      
-      onResourceAdd(newResource);
+        if (file.type !== 'application/pdf') {
+            return;
+        }
+        
+        const newResource = new PDFResourceModel(
+            file.name.replace('.pdf', '') // Remove .pdf extension
+        );
+        newResource.settledTitle = true; // We trust the filename
+        
+        onResourceAdd(newResource);
     });
   };
 
   const handleLinkSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Create initial loading resource
-    const newResource: LinkResource = {
-        resourceType: 'link',
-        id: Math.random().toString(36).substring(2),
-        createdAt: new Date(),
-        tags: [],
-        notes: [],
-        annotations: [],
-        progress: 0,
-        url: linkInput,
-        title: 'Loading...',
-        content: '',
-        loading: true,
-        status: "PROCESSING"
-    };
-    
-    // Add the loading resource to the UI
+    const newResource = new LinkResourceModel(linkInput);
     onResourceAdd(newResource);
     
     // Create the listeners
-    const processedHandler = (processedResource: any) => {
-        onResourceUpdate(newResource.id, processedResource);
+    const processedHandler = (resourceId: string, updates: Partial<Resource>) => {
+        onResourceUpdate(resourceId, updates);
         console.log("update handler ran");
-        console.log(processedResource);
-        // Clean up listeners after success
-        window.electronAPI.resources.removeProcessedListener(processedHandler);
-        window.electronAPI.resources.removeErrorListener(errorHandler);
+        console.log(updates);
+        
+        // Only remove listeners if we're done
+        if (updates.stages?.every(s => s.status === 'DONE' || s.status === 'ERROR')) {
+            window.electronAPI.resources.removeProcessedListener(processedHandler);
+            window.electronAPI.resources.removeErrorListener(errorHandler);
+        }
     };
 
     const errorHandler = (error: string) => {

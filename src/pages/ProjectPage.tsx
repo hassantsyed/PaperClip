@@ -39,27 +39,40 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
     });
   };
 
-  const handleResourceUpdate = (resourceId: string, updatedResource: Resource) => {
-    console.log("RESOURCE UPDATING");
+  const handleResourceUpdate = (resourceId: string, updates: Partial<Resource>) => {
     const currentProject = getProject();
-    console.log("Current resources:", currentProject?.resources);
-    console.log("Looking for resource with ID:", resourceId);
-    console.log("Updated resource:", updatedResource);
-    
     if (!currentProject) return;
 
     const updatedResources = currentProject.resources.map(resource => {
-      if (resource.id === resourceId) {
-        console.log("Found matching resource:", resource);
-        return updatedResource;
-      }
-      return resource;
+        if (resource.id === resourceId) {
+            // If resourceType changes, use the entire update object
+            if (updates.resourceType && updates.resourceType !== resource.resourceType) {
+                return updates as Resource;
+            }
+            
+            // Otherwise merge updates
+            if (updates.stages) {
+                const updatedStages = resource.stages.map(existingStage => {
+                    const updatedStage = updates.stages?.find(
+                        s => s.name === existingStage.name
+                    );
+                    return updatedStage || existingStage;
+                });
+                
+                return { 
+                    ...resource, 
+                    ...updates, 
+                    stages: updatedStages 
+                } as Resource;
+            }
+            
+            return { ...resource, ...updates } as Resource;
+        }
+        return resource;
     });
     
-    console.log("Updated resources array:", updatedResources);
-    
     updateProjectById(currentProject.id, {
-      resources: updatedResources
+        resources: updatedResources
     });
   };
 

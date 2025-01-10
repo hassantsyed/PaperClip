@@ -1,12 +1,23 @@
 import React from 'react';
-import { Resource, TERMINAL_REOSURCE_STATES } from '../constants/interfaces';
+import { Resource } from '../constants/interfaces';
 
 interface ResourceCardProps {
   resource: Resource;
   onDelete?: () => void;
 }
 
+const isTerminal = (resource: Resource): boolean => {
+    // Resource is terminal when all stages are DONE or ERROR
+    return resource.stages.every(stage => 
+        stage.status === 'DONE' || stage.status === 'ERROR'
+    );
+};
+
 export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onDelete }) => {
+  const terminal = isTerminal(resource);
+  console.log(terminal);
+  console.log(resource);
+
   const getResourceIcon = () => {
     switch (resource.resourceType) {
       case 'pdf':
@@ -25,18 +36,16 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onDelete }
     onDelete?.();
   };
 
-  const isTerminal = TERMINAL_REOSURCE_STATES.includes(resource.status);
-
   return (
     <div className="relative w-48 h-48 border-2 border-slate-400 rounded-lg p-4 
                     cursor-pointer hover:bg-slate-200 transition-colors duration-200">
-      {!isTerminal && (
+      {!terminal && (
         <div className="absolute top-2 right-2 w-6 h-6">
           <div className="w-full h-full border-4 border-slate-400 border-t-slate-800 
                          rounded-full animate-spin"></div>
         </div>
       )}
-      {isTerminal && onDelete && (
+      {terminal && onDelete && (
         <button
           onClick={handleDelete}
           className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-300 

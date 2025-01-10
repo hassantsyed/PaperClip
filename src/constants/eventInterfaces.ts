@@ -5,3 +5,9 @@ export interface ProcessUrlEvent {
     id: string;
     sender: WebContents;
 }
+
+export interface PDFProcessEvent {
+    sender: WebContents;
+    id: string;
+    filePath: string;
+}

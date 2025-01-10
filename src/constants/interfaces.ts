@@ -39,9 +39,6 @@ export interface UnderlineAnnotation extends BaseAnnotation {
 
 export type Annotation = HighlightAnnotation | UnderlineAnnotation;
 
-export type ResourceStatus = "ERROR" | "PENDING" | "PROCESSING" | "CHUNKING" | "EMBEDDING" | "DONE";
-export const TERMINAL_REOSURCE_STATES = ["ERROR", "DONE"];
-
 export interface BaseResource {
   resourceType: string;
   id: string;
@@ -50,8 +47,13 @@ export interface BaseResource {
   notes: any[];
   annotations: BaseAnnotation[];
   progress: number;
-  loading: boolean;
-  status: ResourceStatus;
+  stages: ProcessingStage[];
+}
+
+export type StageStatus = 'PENDING' | 'PROCESSING' | 'DONE' | 'ERROR';
+export interface ProcessingStage {
+    name: string;
+    status: StageStatus;
 }
 
 export interface PDFResource extends BaseResource {
@@ -74,6 +76,7 @@ export interface LinkResource extends BaseResource {
   resourceType: 'link';
   url: string;
   title?: string;
+  settledTitle: boolean;
   content?: string;
 }
 

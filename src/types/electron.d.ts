@@ -7,9 +7,9 @@ declare global {
             },
             resources: {
                 process: (url: string, id: string) => void;
-                onProcessed: (callback: (resource: any) => void) => void;
+                onProcessed: (callback: (resourceId: string, updates: Partial<Resource>) => void) => void;
                 onError: (callback: (error: string) => void) => void;
-                removeProcessedListener: (callback: (resource: any) => void) => void;
+                removeProcessedListener: (callback: (resourceId: string, updates: Partial<Resource>) => void) => void;
                 removeErrorListener: (callback: (error: string) => void) => void;
             }
         }
