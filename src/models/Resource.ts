@@ -9,6 +9,7 @@ const createStage = (name: string, status: StageStatus): ProcessingStage => {
 }
 
 export abstract class BaseResourceModel {
+    version: '0.0.1';
     id: string;
     createdAt: Date;
     tags: string[];
@@ -33,6 +34,7 @@ export class PDFResourceModel extends BaseResourceModel implements PDFResource {
     title: string;
     settledTitle: boolean;
     content: string;
+    filePath: string;
 
     constructor(title: string = 'PDF Document') {
         super();

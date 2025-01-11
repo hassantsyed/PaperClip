@@ -40,6 +40,7 @@ export interface UnderlineAnnotation extends BaseAnnotation {
 export type Annotation = HighlightAnnotation | UnderlineAnnotation;
 
 export interface BaseResource {
+  version: '0.0.1';
   resourceType: string;
   id: string;
   createdAt: Date;
@@ -61,6 +62,7 @@ export interface PDFResource extends BaseResource {
   title: string;
   settledTitle: boolean;
   content: string;
+  filePath: string;
 }
 
 export interface YoutubeResource extends BaseResource {

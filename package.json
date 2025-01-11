@@ -49,8 +49,10 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.33.1",
     "@types/node-fetch": "^2.6.12",
     "electron-squirrel-startup": "^1.0.1",
+    "llamaindex": "^0.8.31",
     "node-fetch": "^3.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
