@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { db } from './main/db';
 import { processUrl } from './main/events';

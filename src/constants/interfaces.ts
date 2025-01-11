@@ -95,5 +95,7 @@ export type Resource = PDFResource | LinkResource | FileResource | YoutubeResour
 export interface Project {
     id: string;
     title: string;
-    resources: Resource[];
+    resources: { [id: string]: Resource };
+    createdAt: Date;
+    version: '0.0.1'
 }

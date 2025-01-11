@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Project, Resource } from '../constants/interfaces';
 import { useProjectStore } from '../store/projectStore';
 import ResourceGrid from './ResourceGrid';
+import ResourceViewer from '../components/ResourceViewer';
 
 interface ProjectPageProps {
   projectId: string;
@@ -17,10 +18,11 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
   const updateProjectById = useProjectStore(state => state.updateProjectById);
   const getProject = () => useProjectStore.getState().projects.find(p => p.id === projectId);
   const [isExpanded, setIsExpanded] = useState(true);
+  const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
 
   if (!project) return null;
-  console.log(project.resources);
-
+  console.log(selectedResource);
+  
   const handleTitleSubmit = () => {
     updateProjectById(project.id, { title: editedTitle });
     setIsEditing(false);
@@ -28,14 +30,18 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
 
   const handleResourceAdd = (newResource: Resource) => {
     updateProjectById(project.id, {
-      resources: [...project.resources, newResource]
+      resources: {
+        ...project.resources,
+        [newResource.id]: newResource
+      }
     });
   };
 
   const handleResourceDelete = (resourceId: string) => {
-    console.log("RESOURCE DELETING");
+    const updatedResources = { ...project.resources };
+    delete updatedResources[resourceId];
     updateProjectById(project.id, {
-      resources: project.resources.filter(resource => resource.id !== resourceId)
+      resources: updatedResources
     });
   };
 
@@ -43,36 +49,55 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
     const currentProject = getProject();
     if (!currentProject) return;
 
-    const updatedResources = currentProject.resources.map(resource => {
-        if (resource.id === resourceId) {
-            // If resourceType changes, use the entire update object
-            if (updates.resourceType && updates.resourceType !== resource.resourceType) {
-                return updates as Resource;
-            }
-            
-            // Otherwise merge updates
-            if (updates.stages) {
-                const updatedStages = resource.stages.map(existingStage => {
-                    const updatedStage = updates.stages?.find(
-                        s => s.name === existingStage.name
-                    );
-                    return updatedStage || existingStage;
-                });
-                
-                return { 
-                    ...resource, 
-                    ...updates, 
-                    stages: updatedStages 
-                } as Resource;
-            }
-            
-            return { ...resource, ...updates } as Resource;
+    const resource = currentProject.resources[resourceId];
+    if (!resource) return;
+
+    // If resourceType changes, use the entire update object
+    if (updates.resourceType && updates.resourceType !== resource.resourceType) {
+      const newResource = updates as Resource;
+      updateProjectById(currentProject.id, {
+        resources: {
+          ...currentProject.resources,
+          [resourceId]: newResource
         }
-        return resource;
-    });
-    
+      });
+      return;
+    }
+
+    // Otherwise merge updates
+    if (updates.stages) {
+      const updatedStages = resource.stages.map(existingStage => {
+        const updatedStage = updates.stages?.find(
+          s => s.name === existingStage.name
+        );
+        return updatedStage || existingStage;
+      });
+
+      const updatedResource = {
+        ...resource,
+        ...updates,
+        stages: updatedStages
+      } as Resource;
+
+      updateProjectById(currentProject.id, {
+        resources: {
+          ...currentProject.resources,
+          [resourceId]: updatedResource
+        }
+      });
+      return;
+    }
+
+    const updatedResource = {
+      ...resource,
+      ...updates
+    } as Resource;
+
     updateProjectById(currentProject.id, {
-        resources: updatedResources
+      resources: {
+        ...currentProject.resources,
+        [resourceId]: updatedResource
+      }
     });
   };
 
@@ -119,7 +144,11 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
           className="absolute top-0 left-0 right-0"
           style={{ height: isExpanded ? '40%' : '85%' }}
         >
-          {/* Add your upper content here */}
+          {selectedResource && (
+            <div className="h-full bg-white rounded-lg shadow">
+              <ResourceViewer resource={selectedResource} />
+            </div>
+          )}
         </div>
         <div className="absolute w-full select-none z-10">
           <div 
@@ -140,7 +169,7 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
             </div>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
                           bg-slate-300 px-4 text-sm text-slate-500">
-              {project.resources.length} resources
+              {Object.keys(project.resources).length} resources
             </div>
           </div>
         </div>
@@ -155,6 +184,8 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
             onResourceAdd={handleResourceAdd}
             onResourceDelete={handleResourceDelete}
             onResourceUpdate={handleResourceUpdate}
+            onResourceSelect={setSelectedResource}
+            selectedResourceId={selectedResource?.id}
           />}
         </div>
       </div>

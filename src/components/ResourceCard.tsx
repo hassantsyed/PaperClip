@@ -3,7 +3,9 @@ import { Resource } from '../constants/interfaces';
 
 interface ResourceCardProps {
   resource: Resource;
-  onDelete?: () => void;
+  onDelete: () => void;
+  onSelect: () => void;
+  isSelected?: boolean;
 }
 
 const isTerminal = (resource: Resource): boolean => {
@@ -13,7 +15,7 @@ const isTerminal = (resource: Resource): boolean => {
     );
 };
 
-export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onDelete }) => {
+export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onDelete, onSelect, isSelected }) => {
   const terminal = isTerminal(resource);
   console.log(terminal);
   console.log(resource);
@@ -36,9 +38,20 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onDelete }
     onDelete?.();
   };
 
+  // Add click handler for the entire card
+  const handleClick = () => {
+    onSelect();
+  };
+
   return (
-    <div className="relative w-48 h-48 border-2 border-slate-400 rounded-lg p-4 
-                    cursor-pointer hover:bg-slate-200 transition-colors duration-200">
+    <div 
+      onClick={handleClick}
+      className={`relative w-48 h-48 border-2 rounded-lg p-4 
+                cursor-pointer hover:bg-slate-200 transition-colors duration-200
+                ${isSelected 
+                  ? 'border-blue-500 bg-blue-50 hover:bg-blue-100' 
+                  : 'border-slate-400'}`}
+    >
       {!terminal && (
         <div className="absolute top-2 right-2 w-6 h-6">
           <div className="w-full h-full border-4 border-slate-400 border-t-slate-800 

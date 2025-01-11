@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { version } from 'react';
 import { ProjectCard } from '../components/ProjectCard';
 import { useProjectStore } from '../store/projectStore';
 import { Project, Resource } from '../constants/interfaces';
@@ -12,7 +12,9 @@ const ProjectsGrid:React.FC = () => {
     const newProject = {
       id: Math.random().toString(36).substring(2) + Date.now().toString(36),
       title: `Project ${projects.length + 1}`,
-      resources: [] as Resource[]
+      resources: {} as { [id: string]: Resource },
+      createdAt: new Date(),
+      version: "0.0.1" as const
     };
     addProject(newProject);
   };

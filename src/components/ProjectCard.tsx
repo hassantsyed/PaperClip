@@ -52,7 +52,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       )}
       <h3 className="text-black font-bold">{project?.title}</h3>
       <div className="text-sm text-gray-600 mt-2">
-        {project?.resources.length} Resources
+        {Object.keys(project?.resources || {}).length} Resources
       </div>
     </div>
   );

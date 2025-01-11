@@ -51,6 +51,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.33.1",
     "@types/node-fetch": "^2.6.12",
+    "dotenv": "^16.4.7",
     "electron-squirrel-startup": "^1.0.1",
     "llamaindex": "^0.8.31",
     "node-fetch": "^3.3.2",

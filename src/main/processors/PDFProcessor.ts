@@ -1,5 +1,6 @@
 import { PDFReader, Document } from "llamaindex";
 import { PDFResource, ProcessingStage } from "../../constants/interfaces";
+import { callAIwTools, Conversation, extractTitle } from "../../llms/utils";
 
 export const extractPDFText = async (filePath: string): Promise<string> => {
   try {
@@ -8,7 +9,7 @@ export const extractPDFText = async (filePath: string): Promise<string> => {
     console.log(`Number of documents/pages: ${documents.length}`);
 
     const textContent = documents.map(doc => doc.getText()).join('\n');
-    console.log(textContent)
+    // console.log(textContent)
 
     return textContent;
 
@@ -26,7 +27,19 @@ export const extractPDFTitle = async (filePath: string): Promise<string> => {
     const firstPages = documents.slice(0, 3);
     
     const firstPagesContent = firstPages.map(doc => doc.getText()).join('\n');
-    const extractedTitle = "";
+    const convo: Conversation = {
+        messages:
+            [
+                {
+                    role: "user",
+                    content: [{
+                        type: "text",
+                        text: firstPagesContent
+                    }]
+                }
+            ],
+    }
 
-    return extractedTitle;
+    const titleResp = await callAIwTools(convo, [extractTitle])
+    return titleResp["inputs"]["title"]
 }

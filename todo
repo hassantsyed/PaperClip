@@ -1,14 +1,13 @@
 # IMMEDIATE
 
-Upload Arxiv links
-
-1. UI to add links - DONE
-2. grab PDF from link - DONE
-3. create PDF resource - DONE
-4. Process PDF -
+Chat with main content - pending
 
 PDF main content view
 Resource Selection as main content
+
+highlights
+notes
+annotations
 
 -- Usable for me --
 
@@ -35,3 +34,12 @@ Sidebar has projects
 Support Highlights
 Notes on resources
 Truncate resources like sidebar
+
+1. UI to add links - DONE
+2. grab PDF from link - DONE
+3. create PDF resource - DONE
+   store resources as ids in object (order newest first) - DONE
+
+Handle PDF links
+Extract Title - DONE
+Extract Contents - NAIVE

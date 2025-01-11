@@ -4,13 +4,15 @@ import { ResourceCard } from '../components/ResourceCard';
 import { LinkResourceModel, PDFResourceModel } from '../models/Resource';
 
 interface ResourceGridProps {
-  resources: Resource[];
+  resources: { [id: string]: Resource };
   onResourceAdd: (resource: Resource) => void;
   onResourceDelete: (resourceId: string) => void;
   onResourceUpdate: (resourceId: string, resource: Partial<Resource>) => void;
+  onResourceSelect: (resource: Resource) => void;
+  selectedResourceId?: string;
 }
 
-const ResourceGrid: React.FC<ResourceGridProps> = ({ resources, onResourceAdd, onResourceDelete, onResourceUpdate }) => {
+const ResourceGrid: React.FC<ResourceGridProps> = ({ resources, onResourceAdd, onResourceDelete, onResourceUpdate, onResourceSelect, selectedResourceId }) => {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [linkInput, setLinkInput] = useState('');
 
@@ -125,13 +127,17 @@ const ResourceGrid: React.FC<ResourceGridProps> = ({ resources, onResourceAdd, o
             </div>
           </form>
           <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {resources.map((resource, index) => (
-              <ResourceCard
-                key={index}
-                resource={resource}
-                onDelete={() => onResourceDelete(resource.id)}
-              />
-            ))}
+            {Object.values(resources)
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .map((resource) => (
+                <ResourceCard
+                  key={resource.id}
+                  resource={resource}
+                  onDelete={() => onResourceDelete(resource.id)}
+                  onSelect={() => onResourceSelect(resource)}
+                  isSelected={resource.id === selectedResourceId}
+                />
+              ))}
           </div>
         </div>
       )}
