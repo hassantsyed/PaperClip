@@ -1,16 +1,18 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { PDFResource } from '../../constants/interfaces';
+import { PDFResource, HighlightAnnotation } from '../../constants/interfaces';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 // @ts-ignore
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.js?url';
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+import HighlightLayer from './HighlightLayer';
 
 interface PDFViewerProps {
     resource: PDFResource;
     // Optional callback passed from ResourceViewer:
     onPageRender?: (currentPage: number, totalPages: number) => void;
+    onTextSelect?: (text: string, range: Range, pageNumber: number) => void;
 }
 
 /**
@@ -18,12 +20,23 @@ interface PDFViewerProps {
  * once the page is fully rendered. Then it unobserves on first intersection 
  * so it doesn't trigger repeatedly.
  */
-const ObservedPage: React.FC<{
+interface ObservedPageProps {
   pageNumber: number;
   totalPages: number;
   onVisible?: (pageNumber: number, totalPages: number) => void;
   width: number;
-}> = ({ pageNumber, totalPages, onVisible, width }) => {
+  onTextSelect?: (text: string, range: Range, pageNumber: number) => void;
+  highlights?: HighlightAnnotation[];
+}
+
+const ObservedPage: React.FC<ObservedPageProps> = ({
+  pageNumber,
+  totalPages,
+  onVisible,
+  width,
+  onTextSelect,
+  highlights = []
+}) => {
   const [isRendered, setIsRendered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -62,34 +75,56 @@ const ObservedPage: React.FC<{
     };
   }, [handleIntersect, isRendered]);
 
-  // Called by <Page> once it finishes rendering
-  const onPageRenderSuccess = () => {
-    console.log("RENDER SUCCESS");
-    setIsRendered(true);
-  };
+  const handleTextSelection = useCallback(() => {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed || !onTextSelect) {
+      onTextSelect('', null as unknown as Range, pageNumber); // Clear selection
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    onTextSelect(selection.toString(), range, pageNumber);
+  }, [onTextSelect, pageNumber]);
+
+  // Add event listener for text selection
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    container.addEventListener('mouseup', handleTextSelection);
+    return () => {
+      container.removeEventListener('mouseup', handleTextSelection);
+    };
+  }, [handleTextSelection]);
 
   return (
-    <div ref={containerRef} style={{ marginBottom: '2rem' }}>
+    <div ref={containerRef} style={{ marginBottom: '2rem' }} className="relative">
       <Page
         pageNumber={pageNumber}
         renderAnnotationLayer
         width={width}
         className="shadow-lg"
-        onRenderSuccess={onPageRenderSuccess}
+        onRenderSuccess={() => setIsRendered(true)}
+      />
+      <HighlightLayer 
+        highlights={highlights} 
+        pageNumber={pageNumber} 
       />
     </div>
   );
 };
 
-const PDFViewer: React.FC<PDFViewerProps> = ({ resource, onPageRender }) => {
+const PDFViewer: React.FC<PDFViewerProps> = ({ 
+  resource, 
+  onPageRender,
+  onTextSelect 
+}) => {
     const [numPages, setNumPages] = useState<number>(0);
     const [highestPageSeen, setHighestPageSeen] = useState(0);
     
-    // could also do something like: const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth - 64);
-    const pdfFileUrl = `file://${resource.filePath}`;
-
-    const onDocumentLoadSuccess = (pdf: any) => {
-        setNumPages(pdf.numPages);
+    const handleHighlight = (annotation: HighlightAnnotation) => {
+      // Here you would update the resource with the new annotation
+      console.log('New highlight:', annotation);
     };
 
     // This function is triggered when a page is first "observed" in viewport
@@ -107,8 +142,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ resource, onPageRender }) => {
         // Enforce a scrolling container so not all pages are shown at once
         <div className="p-4 overflow-auto" style={{ height: '80vh' }}>
             <Document
-                file={pdfFileUrl}
-                onLoadSuccess={onDocumentLoadSuccess}
+                file={`file://${resource.filePath}`}
+                onLoadSuccess={(pdf) => setNumPages(pdf.numPages)}
                 onLoadError={console.error}
             >
                 {Array.from(new Array(numPages), (_, index) => (
@@ -118,6 +153,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ resource, onPageRender }) => {
                       totalPages={numPages}
                       onVisible={handlePageVisible}
                       width={window.innerWidth - 64}
+                      onTextSelect={onTextSelect}
+                      highlights={resource.annotations?.filter(a => a.annotationType === 'highlight') as HighlightAnnotation[]}
                     />
                 ))}
             </Document>

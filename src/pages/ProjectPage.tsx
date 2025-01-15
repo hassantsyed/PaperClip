@@ -146,7 +146,10 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
         >
           {selectedResource && (
             <div className="h-full bg-white rounded-lg shadow">
-              <ResourceViewer resource={selectedResource} />
+              <ResourceViewer 
+                resource={selectedResource} 
+                onResourceUpdate={handleResourceUpdate}
+              />
             </div>
           )}
         </div>
