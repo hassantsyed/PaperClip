@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, session } from 'electron';
 import { db } from './main/db';
 import { processUrl } from './main/events';
 
@@ -34,11 +34,30 @@ ipcMain.on('resource:process', (event, url: string, id: string) => {
 const createWindow = (): void => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    height: 600,
-    width: 800,
+    width: 1200,
+    height: 800,
     webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      webSecurity: false,
+      allowFileAccessFromFileURLs: true,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
+  });
+
+  // Modify CSP for PDF.js worker
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self' 'unsafe-eval' 'unsafe-inline' blob: data: file:;",
+          "script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: data: file:;",
+          "worker-src 'self' blob: data: file:;",
+          "connect-src 'self' ws: wss: file:;"
+        ]
+      }
+    });
   });
 
   // and load the index.html of the app.

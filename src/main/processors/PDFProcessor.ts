@@ -1,3 +1,9 @@
+import fetch, { Headers, Request, Response } from 'node-fetch';
+// Provide fetch API globals in the main process
+(global as any).fetch = fetch;
+(global as any).Headers = Headers;
+(global as any).Request = Request;
+(global as any).Response = Response;
 import { PDFReader, Document } from "llamaindex";
 import { PDFResource, ProcessingStage } from "../../constants/interfaces";
 import { callAIwTools, Conversation, extractTitle } from "../../llms/utils";
