@@ -4,6 +4,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 // Set worker path to your bundled or local copy
+// @ts-ignore
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.js?url';
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
@@ -35,11 +36,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ resource }) => {
                 onLoadError={console.error}
             >
                 {Array.from(new Array(numPages), (_, index) => (
-                    <Page
-                        key={`page_${index + 1}`}
-                        pageNumber={index + 1}
-                        renderAnnotationLayer
-                    />
+                    <div key={`page_${index + 1}`} className="mb-8">
+                        <Page
+                            pageNumber={index + 1}
+                            renderAnnotationLayer
+                            width={window.innerWidth - 64}
+                            className="shadow-lg"
+                        />
+                        {index < numPages - 1 && (
+                            <div className="border-b border-gray-300 my-4" />
+                        )}
+                    </div>
                 ))}
             </Document>
         </div>
