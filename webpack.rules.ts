@@ -1,13 +1,27 @@
 import type { ModuleOptions } from 'webpack';
 
 export const rules: Required<ModuleOptions>['rules'] = [
-  // Add support for native node modules
+  // Handle native node modules (unchanged)
   {
-    // We're specifying native_modules in the test because the asset relocator loader generates a
-    // "fake" .node file which is really a cjs file.
     test: /native_modules[/\\].+\.node$/,
     use: 'node-loader',
   },
+
+  // Add this .mjs rule
+  {
+    test: /\.mjs$/,
+    include: /node_modules\/pdfjs-dist/,   // or /pdfjs-dist\/build/ specifically
+    use: {
+      loader: 'file-loader',
+      options: {
+        name: '[name].[contenthash].[ext]',
+        outputPath: 'static/js', // or wherever you want to put it
+      },
+    },
+    type: 'javascript/auto',
+  },
+
+  // The vercel asset relocator rule (unchanged)
   {
     test: /[/\\]node_modules[/\\].+\.(m?js|node)$/,
     parser: { amd: false },
@@ -18,6 +32,8 @@ export const rules: Required<ModuleOptions>['rules'] = [
       },
     },
   },
+
+  // TypeScript loader (unchanged)
   {
     test: /\.tsx?$/,
     exclude: /(node_modules|\.webpack)/,
