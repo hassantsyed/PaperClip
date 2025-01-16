@@ -12,12 +12,23 @@ rules.push({
   ],
 });
 
+rules.push({
+  test: /pdf\.worker\.(min\.)?mjs$/,
+  type: 'asset/resource',
+  generator: {
+    filename: '[name][ext]'
+  }
+});
+
 export const rendererConfig: Configuration = {
   module: {
     rules,
   },
   plugins,
   resolve: {
-    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css'],
+    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.mjs'],
   },
+  output: {
+    publicPath: './',
+  }
 };

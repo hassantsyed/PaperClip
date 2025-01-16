@@ -1,15 +1,12 @@
 # IMMEDIATE
 
-Chat with main content - pending
-
-PDF main content view
-Resource Selection as main content
-
 highlights
 notes
-annotations
+Chat with main content - pending
 
 -- Usable for me --
+
+annotations
 
 PDF chunking and embedding
 
@@ -43,3 +40,5 @@ Truncate resources like sidebar
 Handle PDF links
 Extract Title - DONE
 Extract Contents - NAIVE
+PDF main content view
+Resource Selection as main content

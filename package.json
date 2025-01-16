@@ -29,7 +29,7 @@
     "@vercel/webpack-asset-relocator-loader": "^1.7.3",
     "autoprefixer": "^10.4.20",
     "css-loader": "^6.11.0",
-    "electron": "33.2.1",
+    "electron": "^22.3.27",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.31.0",
     "fork-ts-checker-webpack-plugin": "^7.3.0",
@@ -57,6 +57,7 @@
     "node-fetch": "^3.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-pdf": "^8.0.2",
     "zustand": "^5.0.3"
   }
 }
