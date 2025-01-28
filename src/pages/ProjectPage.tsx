@@ -3,6 +3,7 @@ import { Project, Resource } from '../constants/interfaces';
 import { useProjectStore } from '../store/projectStore';
 import ResourceGrid from './ResourceGrid';
 import ResourceViewer from '../components/ResourceViewer';
+import { useNavigationStore } from '../store/navigationStore';
 
 interface ProjectPageProps {
   projectId: string;
@@ -18,7 +19,11 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
   const updateProjectById = useProjectStore(state => state.updateProjectById);
   const getProject = () => useProjectStore.getState().projects.find(p => p.id === projectId);
   const [isExpanded, setIsExpanded] = useState(true);
-  const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
+  
+  const { selectedResourceId, setSelectedResourceId } = useNavigationStore();
+
+  // Derive selectedResource from selectedResourceId and current project state
+  const selectedResource = selectedResourceId ? project?.resources[selectedResourceId] : null;
 
   if (!project) return null;
   console.log(selectedResource);
@@ -146,7 +151,10 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
         >
           {selectedResource && (
             <div className="h-full bg-white rounded-lg shadow">
-              <ResourceViewer resource={selectedResource} />
+              <ResourceViewer
+                resource={selectedResource}
+                onResourceUpdate={handleResourceUpdate}
+              />
             </div>
           )}
         </div>
@@ -184,8 +192,8 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectId, onBack }) => {
             onResourceAdd={handleResourceAdd}
             onResourceDelete={handleResourceDelete}
             onResourceUpdate={handleResourceUpdate}
-            onResourceSelect={setSelectedResource}
-            selectedResourceId={selectedResource?.id}
+            onResourceSelect={(resource) => setSelectedResourceId(resource.id)}
+            selectedResourceId={selectedResourceId}
           />}
         </div>
       </div>

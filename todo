@@ -2,19 +2,22 @@
 
 Chat with main content - pending
 
-PDF main content view
-Resource Selection as main content
+I do not like the expanding, add the highlights button next to the title for now
 
-highlights
+BUG: highlights are always the full lines, why not partials?
+.. also slightly offset
+
+how to tie notes to portions of the PDF?
+how to tie notes to highlights?
+
 notes
-annotations
 
 -- Usable for me --
 
-PDF chunking and embedding
-
 # BACKLOG
 
+PDF chunking and embedding
+annotations
 Smart citations
 
 Chat with entire workspace
@@ -43,3 +46,7 @@ Truncate resources like sidebar
 Handle PDF links
 Extract Title - DONE
 Extract Contents - NAIVE
+PDF main content view
+Resource Selection as main content
+highlights
+BUG: cannot switch between selected resources
