@@ -37,7 +37,7 @@ events.on('resource:url-submitted', async ({ url, id, sender }: ProcessUrlEvent)
                     fileStream.on('error', reject);
                 }).on('error', reject);
             });
-            pdfResource.filePath = `${id}.pdf`
+            pdfResource.filePath = filePath;
             sender.send('resource:processed', id, pdfResource);
             // Start PDF processing
             events.emit('resource:pdf-detected', { url, id, sender, filePath });

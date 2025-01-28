@@ -1,5 +1,6 @@
 import React from 'react';
 import { Resource } from '../constants/interfaces';
+import CircularProgress from './ResourceViewer/CircularProgress';
 
 interface ResourceCardProps {
   resource: Resource;
@@ -17,8 +18,6 @@ const isTerminal = (resource: Resource): boolean => {
 
 export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onDelete, onSelect, isSelected }) => {
   const terminal = isTerminal(resource);
-  console.log(terminal);
-  console.log(resource);
 
   const getResourceIcon = () => {
     switch (resource.resourceType) {
@@ -38,7 +37,6 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onDelete, 
     onDelete?.();
   };
 
-  // Add click handler for the entire card
   const handleClick = () => {
     onSelect();
   };
@@ -75,8 +73,16 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onDelete, 
          resource.resourceType === 'pdf' ? resource.title :
          'Untitled Resource'}
       </h3>
-      <div className="text-sm text-gray-600 mt-2">
-        {new Date(resource.createdAt).toLocaleDateString()}
+      <div className="text-sm text-gray-600 mt-2 flex items-center gap-2">
+        <span>{new Date(resource.createdAt).toLocaleDateString()}</span>
+        {resource.resourceType === 'pdf' && (
+          <CircularProgress 
+            percentage={resource.progress || 0} 
+            size={20} 
+            strokeWidth={3} 
+            fontSize={8} 
+          />
+        )}
       </div>
       {resource.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-2">
